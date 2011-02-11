@@ -34,12 +34,12 @@ http.createServer(function(req, res) {
 			break;
 		}
 
-		return res.close();
+		return res.end();
 	}
 
 	if (typeof params == 'undefined') {
 		res.writeHead(400);
-		return res.close();
+		return res.end();
 	}
 
 	if (typeof params.format != 'undefined' && params.format != '') {
@@ -55,7 +55,6 @@ http.createServer(function(req, res) {
 	}
 
 	var requestURL = url.parse(params.url);
-
 	if (typeof requestURL.host == 'undefined') {
 		return writeJSONP(-1, true);
 	}
@@ -84,10 +83,9 @@ http.createServer(function(req, res) {
 		port = requestURL.port;
 	}
 
-	var client = http.createClient(port, requestURL.host);
-
-	var request = client.request("GET", path, {
-		Host : requestURL.host,
+	var client = http.createClient(port, requestURL.hostname);
+  var request = client.request("GET", path, {
+		Host : requestURL.hostname,
 		'Accept' : '*/*',
 		'User-Agent' : 'Mozilla/5.0 (compatible; MSIE 6.0; Windows NT5.0)',
 		'Accept-Language' : 'en-us',
@@ -97,7 +95,7 @@ http.createServer(function(req, res) {
 	request.addListener('response', function(response) {
 		var body = '';
 
-		response.setBodyEncoding("utf8");
+		response.setEncoding("utf8");
 
 		response.addListener("data", function(chunk) {
 			body += chunk;
@@ -108,7 +106,7 @@ http.createServer(function(req, res) {
 		});
 	});
 
-	request.close();
+	request.end();
 
 }).listen(apiPort);
 
