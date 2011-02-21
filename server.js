@@ -2,7 +2,7 @@
 // Josh Hundley - http://joshhundley.com - http://twitter.com/oJshua
 
 var sys = require("sys"), http = require("http"), url = require("url");
-var apiPort = process.env.PORT || 8001;
+var apiPort = parseInt(process.env.PORT) || 8001;
 
 http.createServer(function(req, res) {
 
@@ -13,12 +13,23 @@ http.createServer(function(req, res) {
   var response = '';
   var requestUrl;
 
+  function writeUsage(res) {
+    res.writeHead(200, {
+      'Content-Type' : "text/plain"
+    });
+    res.write("JSON-P PROXY\n\n");
+    res.write("Usage:\n");
+    res.write("\turl: The url to access, (required).\n");
+    res.write("\tjsonp: The function name to use for the JSON response. Default is 'jsonp'.");
+    res.write("\tformat: The expected format of the response, if not JSON. Supports: 'text', 'xml', 'string'.\n");
+    return res.end();
+  }
+
   function writeJSONP(contents, override) {
 
     if (typeof override != 'undefined') {
       format = 'json';
     }
-
     res.writeHead(200, {
       'Content-Type' : 'application/javascript'
     });
@@ -33,13 +44,11 @@ http.createServer(function(req, res) {
         res.write(jsonp + '(' + contents + ')');
         break;
     }
-
     return res.end();
   }
 
   if (typeof params == 'undefined') {
-    res.writeHead(400);
-    return res.end();
+    return writeUsage(res);
   }
 
   if (typeof params.format != 'undefined' && params.format != '') {
