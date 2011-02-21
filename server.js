@@ -20,7 +20,7 @@ http.createServer(function(req, res) {
     res.write("JSON-P PROXY\n\n");
     res.write("Usage:\n");
     res.write("\turl: The url to access, (required).\n");
-    res.write("\tjsonp: The function name to use for the JSON response. Default is 'jsonp'.");
+    res.write("\tjsonp: The function name to use for the JSON response. Default is 'jsonp'.\n");
     res.write("\tformat: The expected format of the response, if not JSON. Supports: 'text', 'xml', 'string'.\n");
     return res.end();
   }
