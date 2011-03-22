@@ -60,7 +60,7 @@ http.createServer(function(req, res) {
   }
 
   if (!params.url) {
-    return writeJSONP(-1, true);
+    return writeUsage(res);
   }
 
   var requestURL = url.parse(params.url);
