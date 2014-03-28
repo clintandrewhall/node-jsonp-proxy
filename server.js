@@ -1,7 +1,9 @@
 // Simple JSONP Proxy for NodeJS
 // Josh Hundley - http://joshhundley.com - http://twitter.com/oJshua
 
-var sys = require("sys"), http = require("http"), url = require("url");
+var sys = require("sys"), http = require("http"),
+    url = require("url"), https = require('https');
+
 var apiPort = parseInt(process.env.PORT) || 8001;
 
 http.createServer(function(req, res) {
@@ -12,6 +14,7 @@ http.createServer(function(req, res) {
   var jsonp = 'jsonp';
   var response = '';
   var requestUrl;
+  var protocol;
 
   function writeUsage(res) {
     res.writeHead(200, {
@@ -68,8 +71,15 @@ http.createServer(function(req, res) {
     return writeJSONP(-1, true);
   }
 
+
+  protocol = http;
   if (requestURL.protocol != 'http:') {
-    return writeJSONP(requestURL.protocol);
+    if (requestURL.protocol === 'https:') {
+      protocol = https;
+    }
+    else {
+      return writeJSONP(requestURL.protocol);
+    }
   }
 
   var path = '';
@@ -92,14 +102,16 @@ http.createServer(function(req, res) {
     port = requestURL.port;
   }
 
-  var client = http.createClient(port, requestURL.hostname);
-  var request = client.request("GET", path, {
-    Host : requestURL.hostname,
+  var options = {
+    path: path,
+    method: "GET",
+    hostname : requestURL.hostname,
     'Accept' : '*/*',
     'User-Agent' : 'Mozilla/5.0 (compatible; MSIE 6.0; Windows NT5.0)',
     'Accept-Language' : 'en-us',
     'Accept-Charset' : 'ISO-8859-1,utf-8;q=0.7,*;q=0.7'
-  });
+  };
+  request = protocol.request(options);
 
   request.addListener('response', function(response) {
     var body = '';
